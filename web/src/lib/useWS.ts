@@ -36,7 +36,11 @@ const useWebSocket = () => {
       });
     localStorage.setItem("displayName", displayName);
 
-    const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_WS_DOMAIN}/ws`);
+    const ws = new WebSocket(
+      `${process.env.NODE_ENV === "development" ? "ws" : "wss"}://${
+        process.env.NEXT_PUBLIC_WS_DOMAIN
+      }/ws`
+    );
 
     setSocket(ws);
 
