@@ -23,21 +23,20 @@ const useWebSocket = () => {
 
   useEffect(() => {
     const clientId =
-      localStorage.getItem("clientId") ||
+      localStorage.getItem("clientId") ??
       `client_${Math.random().toString(36).substr(2, 9)}`;
     localStorage.setItem("clientId", clientId);
 
     const displayName =
-      localStorage.getItem("displayName") ||
+      localStorage.getItem("displayName") ??
       uniqueNamesGenerator({
         dictionaries: [colors, animals],
         separator: " ",
         style: "capital",
       });
     localStorage.setItem("displayName", displayName);
-    // `ws://localhost:${process.env.NEXT_PUBLIC_WS_PORT}`
 
-    const ws = new WebSocket(`ws://drop-it-production.up.railway.app/ws`);
+    const ws = new WebSocket(`ws://${process.env.NEXT_PUBLIC_WS_DOMAIN}/ws`);
 
     setSocket(ws);
 
