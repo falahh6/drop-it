@@ -3,13 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"next dev\" \"node server/websocket.js\"",
+    "dev": "next dev",
     "build": "next build",
-    "start": "concurrently \"next start\" \"node server/websocket.js\"",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "concurrently": "^9.1.2",
     "dotenv": "^16.4.7",
     "next": "15.1.5",
     "react": "^19.0.0",

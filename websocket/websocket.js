@@ -21,7 +21,6 @@ class WebSocketServer {
 
         const clientIp = this._getClientIp(req);
 
-        // Add to peer map
         if (!this._rooms[clientIp]) {
           this._rooms[clientIp] = {};
         }
@@ -31,13 +30,11 @@ class WebSocketServer {
           `Client connected: ${clientId} (${displayName}) in room ${clientIp}`
         );
 
-        // Notify room of the new peer
         this._broadcastToRoom(clientIp, {
           type: "peer-joined",
           peer: clientInfo,
         });
 
-        // Send the list of peers to the new client
         const peers = Object.keys(this._rooms[clientIp]).map((id) => ({
           id,
           ...this._rooms[clientIp][id].info,
@@ -47,15 +44,12 @@ class WebSocketServer {
           peers,
         });
 
-        // Handle subsequent messages
         socket.on("message", (data) =>
           this._onMessage(clientId, clientIp, data)
         );
 
-        // Handle disconnection
         socket.on("close", () => this._onDisconnect(clientId, clientIp));
 
-        // Handle errors
         socket.on("error", console.error);
       } catch (e) {
         console.error("Error parsing initial message:", e);
@@ -83,17 +77,13 @@ class WebSocketServer {
   _onDisconnect(clientId, clientIp) {
     console.log(`Client disconnected: ${clientId} from room ${clientIp}`);
 
-    // Check if the room exists and if the clientId is present
     if (this._rooms[clientIp] && this._rooms[clientIp][clientId]) {
-      // Delete the clientId from the room
       delete this._rooms[clientIp][clientId];
 
-      // If the room is empty after deleting the clientId, remove the room itself
       if (Object.keys(this._rooms[clientIp]).length === 0) {
         delete this._rooms[clientIp];
       }
 
-      // Notify room of the peer left
       this._broadcastToRoom(clientIp, {
         type: "peer-left",
         peerId: clientId,

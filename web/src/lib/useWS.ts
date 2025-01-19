@@ -35,10 +35,9 @@ const useWebSocket = () => {
         style: "capital",
       });
     localStorage.setItem("displayName", displayName);
+    // `ws://localhost:${process.env.NEXT_PUBLIC_WS_PORT}`
 
-    const ws = new WebSocket(
-      `ws://localhost:${process.env.NEXT_PUBLIC_WS_PORT}`
-    );
+    const ws = new WebSocket(`ws://drop-it-production.up.railway.app/ws`);
 
     setSocket(ws);
 
