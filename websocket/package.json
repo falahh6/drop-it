@@ -8,5 +8,8 @@
   "dependencies": {
     "ua-parser-js": "^1.0.40",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }

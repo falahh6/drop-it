@@ -58,10 +58,26 @@ class WebSocketServer {
     });
   }
 
-  _onMessage(clientId, clientIp, data) {
+  _onMessage(clientId, clientIp, data, isBinary = false) {
+    if (isBinary) {
+      console.log(`Received binary from ${clientId} in room ${clientIp}`);
+      return;
+    }
+
     try {
       const message = JSON.parse(data);
       console.log(`Received from ${clientId} in room ${clientIp}:`, message);
+
+      if (message.type === "unicast") {
+        const { to, content } = message;
+        if (this._rooms[clientIp][to]) {
+          console.log("Sending to", to);
+          this._send(this._rooms[clientIp][to].socket, {
+            from: clientId,
+            message: content,
+          });
+        }
+      }
 
       if (message.type === "broadcast") {
         this._broadcastToRoom(clientIp, {

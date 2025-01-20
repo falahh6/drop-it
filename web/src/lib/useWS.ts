@@ -58,6 +58,31 @@ const useWebSocket = () => {
       const data = JSON.parse(event.data);
       console.log("Received:", data);
 
+      if (data?.dataType === "file") {
+        const { data: fileData, metadata } =
+          data.message && JSON.parse(data.message);
+
+        if (fileData) {
+          // Decode Base64 string to a Blob
+          const byteCharacters = atob(fileData);
+          const byteNumbers = Array.from(byteCharacters, (char) =>
+            char.charCodeAt(0)
+          );
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: metadata.mimeType });
+          const url = URL.createObjectURL(blob);
+
+          console.log("Metadata", metadata);
+          console.log("URL", url);
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = metadata.name;
+          a.textContent = `Download ${metadata.name}`;
+          document.body.appendChild(a);
+        }
+      }
+
       if (data.type === "peers") {
         setPeers(
           data.peers.map(
@@ -91,6 +116,8 @@ const useWebSocket = () => {
           ...prev,
           { type: "info", message: `${data.peerId} left` },
         ]);
+      } else if (data.type === "files") {
+        // handle files here
       } else {
         setMessages((prev) => [...prev, data]);
       }
@@ -104,7 +131,12 @@ const useWebSocket = () => {
     };
   }, []);
 
-  const sendMessage = (message: { type: string; content: string }) => {
+  const sendMessage = (message: {
+    type: string;
+    content: string;
+    to?: string;
+    dataType?: string;
+  }) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify(message));
     }
