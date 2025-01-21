@@ -69,11 +69,11 @@ class WebSocketServer {
       console.log(`Received from ${clientId} in room ${clientIp}:`, message);
 
       if (message.type === "unicast") {
-        const { to, content } = message;
+        const { to, content, from } = message;
         if (this._rooms[clientIp][to]) {
           console.log("Sending to", to);
           this._send(this._rooms[clientIp][to].socket, {
-            from: clientId,
+            from: from,
             message: content,
           });
         }
@@ -141,6 +141,19 @@ class WebSocketServer {
     const browser = ua.browser.name || "Unknown Browser";
     const device = ua.device.model || "Unknown Device";
 
+    let deviceType;
+    if (/Android/i.test(os)) {
+      deviceType = "Android";
+    } else if (/iOS/i.test(os) || /iPhone|iPad/i.test(device)) {
+      deviceType = "iOS";
+    } else if (/Windows/i.test(os)) {
+      deviceType = "Windows";
+    } else if (/Mac OS/i.test(os)) {
+      deviceType = "MacOS";
+    } else {
+      deviceType = "Unknown Device Type";
+    }
+
     return {
       id: clientId,
       ip: this._getClientIp(req),
@@ -148,6 +161,7 @@ class WebSocketServer {
       browser,
       device,
       displayName: name,
+      deviceType,
     };
   }
 }
