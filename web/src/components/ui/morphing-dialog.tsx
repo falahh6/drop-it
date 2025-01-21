@@ -383,17 +383,20 @@ type MorphingDialogCloseProps = {
     animate: Variant;
     exit: Variant;
   };
+  clearDataHandler: () => void;
 };
 
 function MorphingDialogClose({
   children,
   className,
   variants,
+  clearDataHandler,
 }: MorphingDialogCloseProps) {
   const { setIsOpen, uniqueId } = useMorphingDialog();
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
+    clearDataHandler();
   }, [setIsOpen]);
 
   return (

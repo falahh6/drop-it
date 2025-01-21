@@ -1,6 +1,30 @@
 import { useEffect, useState } from "react";
 import { uniqueNamesGenerator, colors, animals } from "unique-names-generator";
 
+export interface PeerInfoProps {
+  id: string;
+  displayName: string;
+  ip: string;
+  os: string;
+  browser: string;
+  device: string;
+  deviceType: string;
+  isSelf?: boolean;
+}
+
+interface newMessageProps {
+  message: string;
+  from: PeerInfoProps;
+  dataType?: string;
+  data?: {
+    data: string;
+    metadata: {
+      name: string;
+      mimeType: string;
+    };
+  };
+}
+
 const useWebSocket = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [messages, setMessages] = useState<
@@ -9,39 +33,9 @@ const useWebSocket = () => {
       message: string;
     }[]
   >([]);
-  const [peers, setPeers] = useState<
-    {
-      id: string;
-      displayName: string;
-      ip: string;
-      os: string;
-      browser: string;
-      device: string;
-      deviceType: string;
-      isSelf: boolean;
-    }[]
-  >([]);
+  const [peers, setPeers] = useState<PeerInfoProps[]>([]);
 
-  const [newMessage, setNewMessage] = useState<{
-    message: string;
-    from: {
-      id: string;
-      displayName: string;
-      ip: string;
-      os: string;
-      browser: string;
-      device: string;
-      deviceType: string;
-    };
-    dataType?: string;
-    data?: {
-      data: string;
-      metadata: {
-        name: string;
-        mimeType: string;
-      };
-    };
-  }>();
+  const [newMessage, setNewMessage] = useState<newMessageProps | null>();
 
   useEffect(() => {
     const clientId =

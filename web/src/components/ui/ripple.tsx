@@ -72,34 +72,12 @@ const Ripple = React.memo(function Ripple({
               transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`,
               fontSize: "20px",
             }}
+            className="bg-re"
           >
             {peer}
           </div>
         );
       })}
-
-      {/* {Array.from({ length: numElements }, (_, i) => {
-        const angle = (i / numElements) * 2 * Math.PI;
-        const x = radius * Math.cos(angle);
-        const y = radius * Math.sin(angle);
-
-        return (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`,
-              fontSize: "20px",
-            }}
-          >
-            <div className="text-sm p-2  px-4 z-10 bg-gray-200 rounded-xl border border-gray-400 shadow-lg hover:bg-slate-400">
-              {i + 1}
-            </div>
-          </div>
-        );
-      })} */}
     </div>
   );
 });
