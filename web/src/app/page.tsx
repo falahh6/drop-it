@@ -3,7 +3,6 @@
 import Peers from "@/components/Peers";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MorphingDialogProvider } from "@/components/ui/morphing-dialog";
 
 export default function Home() {
   const [displayName, setDisplayName] = useState<string | null>(null);
@@ -15,9 +14,7 @@ export default function Home() {
 
   return (
     <main className="flex max-h-screen w-full -z-10 flex-col items-center justify-center overflow-hidden rounded-lg md:shadow-xl">
-      <MorphingDialogProvider>
-        <Peers />
-      </MorphingDialogProvider>
+      <Peers />
 
       <div className="absolute bottom-4 pb-4 text-center text-gray-600 text-sm">
         <h3 className="">

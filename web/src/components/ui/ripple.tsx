@@ -1,5 +1,4 @@
 import React, { CSSProperties } from "react";
-
 import { cn } from "@/lib/utils";
 
 interface RippleProps {
@@ -18,9 +17,13 @@ const Ripple = React.memo(function Ripple({
   peers,
 }: RippleProps) {
   const circleSize = mainCircleSize;
-  const radius = circleSize / 2;
+  const baseRadius = circleSize / 2;
+
+  // Dynamically adjust the radius based on the number of peers
+  const adjustedRadius = Math.max(baseRadius, peers.length * 40);
 
   const numElements = peers.length;
+
   return (
     <div
       className={cn(
@@ -58,9 +61,10 @@ const Ripple = React.memo(function Ripple({
       })}
 
       {peers.map((peer, i) => {
+        // Calculate angle and position for each peer
         const angle = (i / numElements) * 2 * Math.PI;
-        const x = radius * Math.cos(angle);
-        const y = radius * Math.sin(angle);
+        const x = adjustedRadius * Math.cos(angle);
+        const y = adjustedRadius * Math.sin(angle);
 
         return (
           <div
@@ -72,7 +76,6 @@ const Ripple = React.memo(function Ripple({
               transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`,
               fontSize: "20px",
             }}
-            className="bg-re"
           >
             {peer}
           </div>

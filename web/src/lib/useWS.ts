@@ -35,6 +35,8 @@ const useWebSocket = () => {
 
   const [newMessage, setNewMessage] = useState<newMessageProps | null>();
 
+  const [filesLoading, setFilesLoading] = useState<boolean>(false);
+
   useEffect(() => {
     const clientId =
       localStorage.getItem("clientId") ??
@@ -48,6 +50,7 @@ const useWebSocket = () => {
         separator: " ",
         style: "capital",
       });
+
     localStorage.setItem("displayName", displayName);
 
     let ws: WebSocket;
@@ -115,6 +118,17 @@ const useWebSocket = () => {
             { type: "info", message: `${data.peerId} left` },
           ]);
         } else {
+          if (data.message === "loading files") {
+            setFilesLoading(true);
+
+            setNewMessage({
+              message: data.message,
+              from: data.from,
+            });
+
+            return;
+          }
+
           console.log("NM", data);
           setMessages((prev) => [
             ...prev,
@@ -168,10 +182,6 @@ const useWebSocket = () => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log("Hook new Message L : ", newMessage);
-  }, [newMessage]);
-
   const sendMessage = (message: {
     type: string;
     content: string;
@@ -206,7 +216,15 @@ const useWebSocket = () => {
     }
   };
 
-  return { messages, peers, sendMessage, newMessage, setNewMessage };
+  return {
+    messages,
+    peers,
+    sendMessage,
+    newMessage,
+    setNewMessage,
+    filesLoading,
+    setFilesLoading,
+  };
 };
 
 export default useWebSocket;
