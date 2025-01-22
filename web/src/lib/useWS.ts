@@ -17,12 +17,10 @@ interface newMessageProps {
   from: PeerInfoProps;
   dataType?: string;
   data?: {
-    data: string;
-    metadata: {
-      name: string;
-      mimeType: string;
-    };
-  };
+    name: string;
+    type: string;
+    base64: string;
+  }[];
 }
 
 const useWebSocket = () => {
@@ -83,30 +81,6 @@ const useWebSocket = () => {
         const data = JSON.parse(event.data);
         console.log("Received:", data);
 
-        if (data?.dataType === "file") {
-          const { data: fileData, metadata } =
-            data.message && JSON.parse(data.message);
-
-          if (fileData) {
-            const byteCharacters = atob(fileData);
-            const byteNumbers = Array.from(byteCharacters, (char) =>
-              char.charCodeAt(0)
-            );
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: metadata.mimeType });
-            const url = URL.createObjectURL(blob);
-
-            console.log("Metadata", metadata);
-            console.log("URL", url);
-
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = metadata.name;
-            a.textContent = `Download ${metadata.name}`;
-            document.body.appendChild(a);
-          }
-        }
-
         if (data.type === "peers") {
           setPeers(
             data.peers.map(
@@ -140,8 +114,6 @@ const useWebSocket = () => {
             ...prev,
             { type: "info", message: `${data.peerId} left` },
           ]);
-        } else if (data.type === "files") {
-          // handle files here
         } else {
           console.log("NM", data);
           setMessages((prev) => [
@@ -151,10 +123,20 @@ const useWebSocket = () => {
               message: data.message,
             },
           ]);
-          setNewMessage({
-            message: data.message,
-            from: data.from,
-          });
+
+          if (data.dataType === "files") {
+            setNewMessage({
+              message: data.message,
+              from: data.from,
+              dataType: data.dataType,
+              data: JSON.parse(data.message.files),
+            });
+          } else {
+            setNewMessage({
+              message: data.message,
+              from: data.from,
+            });
+          }
         }
 
         ws.onerror = (error) => {
@@ -202,12 +184,24 @@ const useWebSocket = () => {
       if (peers.length === 0) {
         socket.send(JSON.stringify(message));
       } else {
-        const from = peers.find(
-          (peer) => peer.id === localStorage.getItem("clientId")
-        );
+        if (message.type === "files") {
+          const files = JSON.parse(message.content);
+          console.log("Files", files);
 
-        console.log("Sending message", { ...message, from });
-        socket.send(JSON.stringify({ ...message, from }));
+          const from = peers.find(
+            (peer) => peer.id === localStorage.getItem("clientId")
+          );
+
+          console.log("Sending message", { ...message, from });
+          socket.send(JSON.stringify({ ...message, from }));
+        } else {
+          const from = peers.find(
+            (peer) => peer.id === localStorage.getItem("clientId")
+          );
+
+          console.log("Sending message", { ...message, from });
+          socket.send(JSON.stringify({ ...message, from }));
+        }
       }
     }
   };

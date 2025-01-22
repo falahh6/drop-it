@@ -82,10 +82,21 @@ class WebSocketServer {
         const { to, content, from } = message;
         if (this._rooms[clientIp][to]) {
           console.log("Sending to", to);
-          this._send(this._rooms[clientIp][to].socket, {
-            from: from,
-            message: content,
-          });
+
+          if (message.dataType === "files") {
+            this._send(this._rooms[clientIp][to].socket, {
+              from: from,
+              message: {
+                files: message.content,
+              },
+              dataType: "files",
+            });
+          } else {
+            this._send(this._rooms[clientIp][to].socket, {
+              from: from,
+              message: content,
+            });
+          }
         }
       }
 
