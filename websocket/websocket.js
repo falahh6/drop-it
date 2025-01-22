@@ -35,6 +35,16 @@ class WebSocketServer {
           peer: clientInfo,
         });
 
+        this._broadcastToRoom(clientIp, {
+          type: "peers",
+          peers:
+            this._rooms[clientIp] &&
+            Object.keys(this._rooms[clientIp]).map((id) => ({
+              id,
+              ...this._rooms[clientIp][id].info,
+            })),
+        });
+
         const peers = Object.keys(this._rooms[clientIp]).map((id) => ({
           id,
           ...this._rooms[clientIp][id].info,
@@ -103,6 +113,16 @@ class WebSocketServer {
       this._broadcastToRoom(clientIp, {
         type: "peer-left",
         peerId: clientId,
+      });
+
+      this._broadcastToRoom(clientIp, {
+        type: "peers",
+        peers:
+          this._rooms[clientIp] &&
+          Object.keys(this._rooms[clientIp]).map((id) => ({
+            id,
+            ...this._rooms[clientIp][id].info,
+          })),
       });
     } else {
       console.log(`No room found for clientId: ${clientId} at IP: ${clientIp}`);

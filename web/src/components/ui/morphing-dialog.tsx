@@ -73,9 +73,9 @@ type MorphingDialogProps = {
 
 function MorphingDialog({ children, transition }: MorphingDialogProps) {
   return (
-    // <MorphingDialogProvider>
-    <MotionConfig transition={transition}>{children}</MotionConfig>
-    // </MorphingDialogProvider>
+    <MorphingDialogProvider>
+      <MotionConfig transition={transition}>{children}</MotionConfig>
+    </MorphingDialogProvider>
   );
 }
 
@@ -397,7 +397,7 @@ function MorphingDialogClose({
   const handleClose = useCallback(() => {
     setIsOpen(false);
     clearDataHandler();
-  }, [setIsOpen]);
+  }, [setIsOpen, clearDataHandler]);
 
   return (
     <motion.button
