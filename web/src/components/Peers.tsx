@@ -1,6 +1,13 @@
 "use client";
 
-import { Download, Files, Loader, Monitor, Text } from "lucide-react";
+import {
+  Download,
+  Files,
+  Loader,
+  Monitor,
+  Smartphone,
+  Text,
+} from "lucide-react";
 import { Button } from "./ui/button";
 
 import { ExpandableTabs } from "./ui/expandable-tabs";
@@ -18,6 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import DowloadAll from "./DowloadAllFiles";
 import { DialogTrigger } from "@radix-ui/react-dialog";
+import { disableConsoleLogs } from "@/lib/utils";
 
 export interface PeerProps {
   peer: PeerInfoProps;
@@ -35,7 +43,11 @@ const PeerInfoDiv = ({
   return (
     <div className="flex flex-row gap-2">
       <div className="mt-0.5">
-        <Monitor className="h-5 w-5" />
+        {peer.deviceType === "Android" || peer.deviceType === "iOs" ? (
+          <Smartphone className="h-5 w-5" />
+        ) : (
+          <Monitor className="h-5 w-5" />
+        )}
       </div>
       <div className="flex flex-col text-left text-xs">
         <p className="font-semibold">{peer.displayName}</p>
@@ -56,6 +68,9 @@ const Peers = () => {
     filesLoading,
     setFilesLoading,
   } = useWebSocket();
+
+  disableConsoleLogs();
+
   const [message, setMessage] = useState<string>("");
   const [copyText, setCopyText] = useState<string>("Copy Text");
   const [messageDialogOpen, setMessageDialogOpen] = useState(false);
@@ -123,8 +138,10 @@ const Peers = () => {
     setMessageDialogOpen(false);
 
     setFiles([]);
+    setMessage("");
     setIsOpen(false);
     setNewMessage(null);
+    setType("text");
   };
 
   const handleSend = (peerId?: string) => {
@@ -189,7 +206,7 @@ const Peers = () => {
             }
           }}
         >
-          <DialogContent className="rounded-3xl">
+          <DialogContent className="rounded-3xl max-sm:max-w-[80%]">
             <DialogHeader className="">
               <DialogTitle>
                 <p className="my-2 text-xs">Shared by</p>
@@ -234,7 +251,7 @@ const Peers = () => {
                           placeholder="Type your message here."
                           id="message"
                           defaultValue={newMessage.message}
-                          className="bg-muted max-sm:min-w-[80vw] text-foreground rounded-2xl p-3 border border-gray-200 focus-visible:ring-1 focus-visible:ring-gray-300 max-sm:w-full text-sm disabled:hover:cursor-text"
+                          className="bg-muted w-full text-foreground rounded-2xl p-3 border border-gray-200 focus-visible:ring-1 focus-visible:ring-gray-300 max-sm:w-full text-sm disabled:hover:cursor-text"
                           rows={6}
                           disabled
                         />
@@ -252,7 +269,7 @@ const Peers = () => {
                   </Button>
                   {!newMessage?.dataType ? (
                     <Button
-                      className="rounded-2xl w-full  font-bold" //bg-gray-200 hover:bg-gray-100 text-black
+                      className="rounded-2xl w-full font-bold" //bg-gray-200 hover:bg-gray-100 text-black
                       variant={"default"}
                       onClick={() => {
                         navigator.clipboard
@@ -287,7 +304,15 @@ const Peers = () => {
         peers={peers
           .filter((peer) => !peer.isSelf)
           .map((peer) => (
-            <Dialog key={peer.id} open={isOpen}>
+            <Dialog
+              key={peer.id}
+              open={isOpen}
+              onOpenChange={(val) => {
+                if (val === false) {
+                  closeAndClear();
+                }
+              }}
+            >
               <DialogTrigger asChild>
                 <Button
                   className="p-2 border h-fit border-gray-500 shadow-lg rounded-xl text-gray-800"
@@ -300,13 +325,13 @@ const Peers = () => {
                 </Button>
               </DialogTrigger>
 
-              <DialogContent className="rounded-3xl">
+              <DialogContent className="rounded-2xl max-sm:max-w-[80%]">
                 <>
                   <DialogTitle>
                     <p className="my-2 text-xs text-left">Sharing to</p>
                     <PeerInfoDiv peer={peer} />
                   </DialogTitle>
-                  <div className="my-4 mb-2">
+                  <div className="my-2 mb-2">
                     <ExpandableTabs
                       tabs={[
                         { title: "Message", icon: Text },
@@ -342,7 +367,7 @@ const Peers = () => {
                       />
                     </div>
                   )}
-                  <div className="my-2 mb-6 flex flex-row gap-2">
+                  <div className="my-2 flex flex-row gap-2">
                     <Button
                       className="rounded-2xl w-full font-bold" //bg-red-100 hover:bg-red-200 text-red-500
                       variant={"destructive"}

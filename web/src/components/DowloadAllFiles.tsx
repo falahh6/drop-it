@@ -36,12 +36,13 @@ const DowloadAll = ({
       })
       .then((content) => {
         saveAs(content, "files.zip");
+
+        closeAndClear();
       })
+
       .catch((error) => {
         console.error("Error generating zip:", error);
       });
-
-    closeAndClear();
   };
   return (
     <Button
