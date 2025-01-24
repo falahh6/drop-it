@@ -1,4 +1,4 @@
-## Drop It
+## Droppy
 
 The web version of Apple Airdrop on browser using websocket
 

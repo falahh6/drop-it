@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { IconUpload } from "@tabler/icons-react";
 import { useDropzone } from "react-dropzone";
+import { truncateText } from "@/lib/utils";
 
 export const FileUpload = ({
   onChange,
@@ -77,15 +78,15 @@ export const FileUpload = ({
             >
               <div className="flex items-center space-x-2 overflow-hidden">
                 <p className="text-sm text-neutral-700 dark:text-neutral-300 truncate max-w-xs">
-                  {file.name}
+                  {truncateText(file.name, 34)}
                 </p>
-                <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 bg-gray-100 p-0.5 px-1 rounded-lg ">
                   {(file.size / (1024 * 1024)).toFixed(2)} MB
                 </p>
               </div>
               <button
                 onClick={() => onDelete && onDelete(idx)}
-                className="text-red-500 hover:text-red-700 text-sm z-10"
+                className="text-red-500 hover:text-red-700 text-xs font-semibold z-10"
               >
                 Delete
               </button>

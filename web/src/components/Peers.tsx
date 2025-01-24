@@ -13,7 +13,7 @@ import { Button } from "./ui/button";
 import { ExpandableTabs } from "./ui/expandable-tabs";
 import { Textarea } from "./ui/textarea";
 import useWebSocket, { PeerInfoProps } from "@/lib/useWS";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FileUpload } from "./ui/file-upload";
 import Ripple from "./ui/ripple";
 
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import DowloadAll from "./DowloadAllFiles";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { disableConsoleLogs } from "@/lib/utils";
+import { disableConsoleLogs, truncateText } from "@/lib/utils";
 
 export interface PeerProps {
   peer: PeerInfoProps;
@@ -86,6 +86,12 @@ const Peers = () => {
     }[]
   >([]);
 
+  const sendAudioRef = useRef<HTMLAudioElement>(null);
+
+  const playSendSound = () => {
+    sendAudioRef.current?.play();
+  };
+
   const handleFileUpload = (newFiles: File[]) => {
     console.log("New Files", newFiles);
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
@@ -99,6 +105,10 @@ const Peers = () => {
     console.log("newMessage in Peer.tsx : ", newMessage);
 
     if (newMessage) {
+      if (isOpen) {
+        setIsOpen(false);
+      }
+
       setMessageDialogOpen(true);
 
       if (newMessage.dataType === "files") {
@@ -130,6 +140,8 @@ const Peers = () => {
         console.log("Downloadable Files", downloadableFiles);
         setDownloadableFiles(downloadableFiles);
         setFilesLoading(false);
+      } else {
+        setMessage(newMessage.message);
       }
     }
   }, [newMessage, setFilesLoading]);
@@ -151,6 +163,7 @@ const Peers = () => {
         to: peerId,
         content: message,
       });
+      playSendSound();
       closeAndClear();
     } else {
       console.log("Files : ", files);
@@ -187,6 +200,7 @@ const Peers = () => {
             content: JSON.stringify(base64Files),
             dataType: "files",
           });
+          playSendSound();
           closeAndClear();
         })
         .catch((error) => {
@@ -197,6 +211,8 @@ const Peers = () => {
 
   return (
     <>
+      <audio ref={sendAudioRef} src="/sounds/send.wav" preload="auto" />
+
       {newMessage && (
         <Dialog
           open={messageDialogOpen}
@@ -230,9 +246,8 @@ const Peers = () => {
                             >
                               <div className="flex items-center space-x-2 overflow-hidden">
                                 <p className="text-sm text-neutral-700 dark:text-neutral-300 truncate max-w-xs">
-                                  {file.name}
+                                  {truncateText(file.name, 28)}
                                 </p>
-                                <p className="text-xs text-neutral-600 dark:text-neutral-400"></p>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <a
@@ -250,7 +265,7 @@ const Peers = () => {
                         <Textarea
                           placeholder="Type your message here."
                           id="message"
-                          defaultValue={newMessage.message}
+                          defaultValue={message}
                           className="bg-muted w-full text-foreground rounded-2xl p-3 border border-gray-200 focus-visible:ring-1 focus-visible:ring-gray-300 max-sm:w-full text-sm disabled:hover:cursor-text"
                           rows={6}
                           disabled
@@ -300,6 +315,7 @@ const Peers = () => {
           </DialogContent>
         </Dialog>
       )}
+
       <Ripple
         peers={peers
           .filter((peer) => !peer.isSelf)
