@@ -1,7 +1,36 @@
 import React, { useRef } from "react";
-import { IconUpload } from "@tabler/icons-react";
+import { IconPdf, IconUpload } from "@tabler/icons-react";
 import { useDropzone } from "react-dropzone";
 import { truncateText } from "@/lib/utils";
+import {
+  BookText,
+  File,
+  FileArchive,
+  FileAudio,
+  Image,
+  Text,
+  VideoIcon,
+} from "lucide-react";
+
+const fileIcons = {
+  image: <Image className="h-4 w-4 inline" />,
+  pdf: <IconPdf className="h-4 w-4 inline" />,
+  video: <VideoIcon className="h-4 w-4 inline" />,
+  mp4: <VideoIcon className="h-4 w-4 inline" />,
+  audio: <FileAudio className="h-4 w-4 inline" />,
+  zip: <FileArchive className="h-4 w-4 inline" />,
+  doc: <BookText className="h-4 w-4 inline" />,
+  txt: <Text className="h-4 w-4 inline" />,
+  default: <File className="h-4 w-4 inline" />,
+};
+
+const fileTypeIcon = (fileType: string): keyof typeof fileIcons => {
+  return (
+    (Object.keys(fileIcons).find((type) =>
+      fileType.includes(type)
+    ) as keyof typeof fileIcons) || "default"
+  );
+};
 
 export const FileUpload = ({
   onChange,
@@ -33,7 +62,7 @@ export const FileUpload = ({
 
   return (
     <div className="w-full" {...getRootProps()}>
-      <div className="p-10 group/file block rounded-2xl cursor-pointer w-full relative overflow-hidden">
+      <div className="p-10 max-sm:p-4 group/file block rounded-2xl cursor-pointer w-full relative overflow-hidden">
         <div onClick={handleClick}>
           <input
             ref={fileInputRef}
@@ -69,27 +98,31 @@ export const FileUpload = ({
             </div>
           </div>
         </div>
-
         {files.length > 0 &&
           files.map((file, idx) => (
             <div
               key={"file" + idx}
-              className="relative overflow-hidden z-40 bg-white dark:bg-neutral-900 flex items-center justify-between p-3 mt-2 w-full mx-auto rounded-md shadow-sm"
+              className="relative overflow-hidden z-40 bg-white border dark:bg-neutral-900 flex max-sm:flex-col items-center justify-between p-3 max-sm:p-2 mt-2 w-full mx-auto rounded-xl shadow-sm"
             >
-              <div className="flex items-center space-x-2 overflow-hidden">
-                <p className="text-sm text-neutral-700 dark:text-neutral-300 truncate max-w-xs">
-                  {truncateText(file.name, 34)}
-                </p>
-                <p className="text-xs text-neutral-600 dark:text-neutral-400 bg-gray-100 p-0.5 px-1 rounded-lg ">
-                  {(file.size / (1024 * 1024)).toFixed(2)} MB
-                </p>
+              <div className="w-full flex max-sm:flex-wrap justify-between gap-2 items-center space-x-2 overflow-hidden">
+                <div className="text-sm text-neutral-700 dark:text-neutral-300 truncate max-w-xs flex flex-row items-center">
+                  <span className="mr-2">
+                    {fileIcons[fileTypeIcon(file.type)]}
+                  </span>
+                  <p>{truncateText(file.name, 30)}</p>
+                </div>
+                <div className="flex flex-row justify-between items-center">
+                  <p className="text-[10px] font-semibold mr-2 text-neutral-600 dark:text-neutral-400 bg-gray-100 p-0.5 px-1 rounded-lg ">
+                    {(file.size / (1024 * 1024)).toFixed(2)} MB
+                  </p>
+                  <button
+                    onClick={() => onDelete && onDelete(idx)}
+                    className="text-red-500 hover:text-red-700 text-xs font-semibold z-10"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={() => onDelete && onDelete(idx)}
-                className="text-red-500 hover:text-red-700 text-xs font-semibold z-10"
-              >
-                Delete
-              </button>
             </div>
           ))}
       </div>
