@@ -194,6 +194,7 @@ const Peers = () => {
 
       Promise.all(base64FilesPromises)
         .then((base64Files) => {
+          console.log("Base64 Files", base64Files);
           sendMessage({
             type: "unicast",
             to: peerId,
@@ -282,7 +283,7 @@ const Peers = () => {
                   >
                     Cancel
                   </Button>
-                  {!newMessage?.dataType ? (
+                  {!newMessage?.dataType && !filesLoading ? (
                     <Button
                       className="rounded-2xl w-full font-bold" //bg-gray-200 hover:bg-gray-100 text-black
                       variant={"default"}
@@ -307,6 +308,7 @@ const Peers = () => {
                     <DowloadAll
                       filesToDownload={downloadableFiles}
                       closeAndClear={closeAndClear}
+                      isLoading={filesLoading}
                     />
                   )}
                 </div>

@@ -63,6 +63,10 @@ const useWebSocket = () => {
         }/ws`
       );
 
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+
       setSocket(ws);
 
       ws.onopen = () => {
@@ -145,6 +149,7 @@ const useWebSocket = () => {
               dataType: data.dataType,
               data: JSON.parse(data.message.files),
             });
+            setFilesLoading(false);
           } else {
             setNewMessage({
               message: data.message,

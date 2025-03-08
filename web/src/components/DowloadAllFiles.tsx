@@ -8,9 +8,11 @@ import { Download } from "lucide-react";
 const DowloadAll = ({
   filesToDownload,
   closeAndClear,
+  isLoading,
 }: {
   filesToDownload: { name: string; url: string }[];
   closeAndClear: () => void;
+  isLoading: boolean;
 }) => {
   const downloadHandler = () => {
     const zip = new JSZip();
@@ -48,6 +50,7 @@ const DowloadAll = ({
     <Button
       className="rounded-2xl w-full font-bold"
       variant={"default"}
+      disabled={isLoading}
       onClick={downloadHandler}
     >
       <Download className="h-4 w-4 " /> Download All
