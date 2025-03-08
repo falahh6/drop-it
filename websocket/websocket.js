@@ -91,6 +91,14 @@ class WebSocketServer {
               },
               dataType: "files",
             });
+          } else if (message.dataType === "loading-files") {
+            this._send(this._rooms[clientIp][to].socket, {
+              from: from,
+              message: {
+                files: message.content,
+              },
+              dataType: "loading-files",
+            });
           } else {
             this._send(this._rooms[clientIp][to].socket, {
               from: from,

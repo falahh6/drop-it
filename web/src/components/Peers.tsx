@@ -14,7 +14,7 @@ import { ExpandableTabs } from "./ui/expandable-tabs";
 import { Textarea } from "./ui/textarea";
 import useWebSocket, { PeerInfoProps } from "@/lib/useWS";
 import React, { useEffect, useRef, useState } from "react";
-import { FileUpload } from "./ui/file-upload";
+import { fileTypeIcon, FileUpload } from "./ui/file-upload";
 import Ripple from "./ui/ripple";
 
 import {
@@ -83,6 +83,7 @@ const Peers = () => {
     {
       url: string;
       name: string;
+      type: string;
     }[]
   >([]);
 
@@ -132,6 +133,7 @@ const Peers = () => {
                 return {
                   name: file.name,
                   url,
+                  type: file.type,
                 };
               }
             )) ||
@@ -171,7 +173,13 @@ const Peers = () => {
       sendMessage({
         type: "unicast",
         to: peerId,
-        content: "loading files",
+        dataType: "loading-files",
+        content: JSON.stringify({
+          files: files.map((file) => ({
+            name: file.name,
+            type: file.type,
+          })),
+        }),
       });
 
       const base64FilesPromises = files.map(
@@ -195,6 +203,7 @@ const Peers = () => {
       Promise.all(base64FilesPromises)
         .then((base64Files) => {
           console.log("Base64 Files", base64Files);
+
           sendMessage({
             type: "unicast",
             to: peerId,
@@ -232,9 +241,26 @@ const Peers = () => {
               <div>
                 <div className="my-4">
                   {filesLoading && (
-                    <div className="p-4 flex flex-row gap-2 items-center text-sm">
-                      <Loader className="h-4 w-4 animate-spin" /> Loading files
-                    </div>
+                    <>
+                      {newMessage.data?.map((file, idx) => (
+                        <div
+                          key={"file" + idx}
+                          className="relative overflow-hidden z-40 bg-white dark:bg-neutral-900 flex items-center justify-between p-3 mt-2 w-full mx-auto rounded-md shadow-sm"
+                        >
+                          <div className="flex items-center space-x-2 overflow-hidden">
+                            <div className="text-sm text-neutral-700 dark:text-neutral-300 truncate max-w-xs flex flex-row items-center">
+                              <span className="mr-2">
+                                {fileTypeIcon(file.type)}
+                              </span>
+                              <p>{truncateText(file.name, 30)}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Loader className="h-4 w-4 animate-spin" />
+                          </div>
+                        </div>
+                      ))}
+                    </>
                   )}
                   {!filesLoading && (
                     <>
@@ -246,9 +272,12 @@ const Peers = () => {
                               className="relative overflow-hidden z-40 bg-white dark:bg-neutral-900 flex items-center justify-between p-3 mt-2 w-full mx-auto rounded-md shadow-sm"
                             >
                               <div className="flex items-center space-x-2 overflow-hidden">
-                                <p className="text-sm text-neutral-700 dark:text-neutral-300 truncate max-w-xs">
-                                  {truncateText(file.name, 28)}
-                                </p>
+                                <div className="text-sm text-neutral-700 dark:text-neutral-300 truncate max-w-xs flex flex-row items-center">
+                                  <span className="mr-2">
+                                    {fileTypeIcon(file.type)}
+                                  </span>
+                                  <p>{truncateText(file.name, 30)}</p>
+                                </div>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <a

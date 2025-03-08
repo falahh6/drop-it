@@ -24,12 +24,12 @@ const fileIcons = {
   default: <File className="h-4 w-4 inline" />,
 };
 
-const fileTypeIcon = (fileType: string): keyof typeof fileIcons => {
-  return (
-    (Object.keys(fileIcons).find((type) =>
-      fileType.includes(type)
-    ) as keyof typeof fileIcons) || "default"
+export const fileTypeIcon = (fileType: string) => {
+  const matchedKey = Object.keys(fileIcons).find((key) =>
+    fileType.includes(key)
   );
+
+  return fileIcons[matchedKey as keyof typeof fileIcons] || fileIcons.default;
 };
 
 export const FileUpload = ({
@@ -106,9 +106,7 @@ export const FileUpload = ({
             >
               <div className="w-full flex max-sm:flex-wrap justify-between gap-2 items-center space-x-2 overflow-hidden">
                 <div className="text-sm text-neutral-700 dark:text-neutral-300 truncate max-w-xs flex flex-row items-center">
-                  <span className="mr-2">
-                    {fileIcons[fileTypeIcon(file.type)]}
-                  </span>
+                  <span className="mr-2">{fileTypeIcon(file.type)}</span>
                   <p>{truncateText(file.name, 30)}</p>
                 </div>
                 <div className="flex flex-row justify-between items-center">

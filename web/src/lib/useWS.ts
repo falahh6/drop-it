@@ -122,11 +122,13 @@ const useWebSocket = () => {
             { type: "info", message: `${data.peerId} left` },
           ]);
         } else {
-          if (data.message === "loading files") {
+          if (data.dataType === "loading-files") {
             setFilesLoading(true);
 
             setNewMessage({
               message: data.message,
+              data: JSON.parse(data.message.files).files,
+              dataType: data.dataType,
               from: data.from,
             });
 
